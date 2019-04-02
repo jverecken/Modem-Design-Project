@@ -13,8 +13,12 @@ function z = qamdemodBis(vec,n_x,n_y)
         y=(1:n_y)-ceil(n_y/2);
     end
     y=y'*j;
-    m=(y+x);
-    m=m/mean(mean(abs(m)));
+    m=(y+x)/sum(abs(m));
+    for a=1:n_x
+        for b=1:n_y
+            m(a,b)=m(a,b)/abs(m(a,b));
+        end
+    end
     decoder=reshape(m,[1 n_x*n_y]);
     dist_vec=vec-transpose(decoder);
     [~,index]=min(abs(dist_vec));
