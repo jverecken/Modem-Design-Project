@@ -3,7 +3,7 @@ function x = ofdmmod(s,N,L,K,indexK)
 N_symbols = length(s);
 N_blocks = floor((N_symbols)/(N-K));
 tx_blocks = reshape(s,[N_blocks,N-K]);
-kjjj
+
 % add null tones
 for k=1:K
     tx_blocks = cat(2,tx_blocks(:,1:indexK(k)),...
