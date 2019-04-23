@@ -19,7 +19,6 @@ s = qammodBis(tx_symbols,2,2);
 
 %% ofdm modulation
 x = ofdmmod(s,N,L,K,indexK);
-x = x/(x*x'/N_symbols);
 
 % pulse shaping
 M = 10; % oversampling factor
@@ -50,7 +49,7 @@ SER = zeros(1,N_SNR);
 for i = 1:N_SNR
     %% generate noise
     noise = (randn(1,length(x)) + 1i*randn(1,length(x)))/sqrt(2);
-    nu = N/(N+L)*sqrt((Es_N0(i))^-1)*noise; %((N-K)/(N+L))
+    nu = sqrt((Es_N0(i))^-1)*noise; %((N-K)/(N+L))
     
     % received signal
     r = r_nf + nu;

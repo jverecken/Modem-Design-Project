@@ -20,9 +20,8 @@ SNR = [0 10 20];
 Es_N0 = 10.^(SNR/10); % in db
 
 mu = Pmax / N; % initial guess
-tol = 0.0001*Pmax;
-itermax = 10000;
-delta = 0.001*Pmax/N;
+tol = 0.05*Pmax;
+itermax = 100;
 
 [sigma2xk,sigma2nk] = deal(zeros(length(Es_N0),N));
 bk = zeros(length(Es_N0),N);
@@ -42,21 +41,20 @@ for i=1:length(Es_N0)
             fprintf('Pmax too low\n');
             break;
         end
-        if (abs(sum(sigma2xk(i,:)) - Pmax) > tol && iter < itermax)
-            if (sum(sigma2xk(i,:)) < Pmax)
+        if (abs(sum(sigma2xk(i,:))-tol) < Pmax & iter < itermax)
+            if sum(sigma2xk(i,:)) < Pmax
                 mu = mu + delta;
             else
-                mu = mu - delta;
-            end
+                mu = mu - delta
         else
             do = 0;
         end
         iter = iter +1;
     end
     figure;
-    plot((Pmax/N)./sigma2nk(i,:),'.b');
+    plot(sigma2nk(i,:)./repmat(mu,1,N),'.b');
     hold on;
-    plot(sigma2xk(i,:)./sigma2nk(i,:),'.r');
+    plot(sigma2xk(i,:)+sigma2nk(i,:)./repmat(mu,1,N),'.r');
 end
 
 
