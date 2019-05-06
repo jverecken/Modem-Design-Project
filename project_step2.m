@@ -10,7 +10,7 @@ load('CIR.mat'); % channel response
 lambda = fft(h,N); % power of each channel
 
 % bit loading
-Pmax = N*1; % max power is the uniform repartition power N*sigma_s^2
+Pmax = N*1; % max power is the uniform repartition power N*sigma_I^2
 pe_target = 1e-5;
 G = Gamma(pe_target);
 SNR = [0 10 20];
