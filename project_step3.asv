@@ -5,22 +5,23 @@ clearvars;
 %% parameters
 N = 128; % number of subcarriers
 L = 8; % length of the channel coefficients
-sigma2 = 2/pi; % scale factor normalized rayleigh (mean = 1)
 
-M = 30; % number of trials
+M = 100; % number of trials
 SNR = linspace(0,20,11); % db
 Es_N0 = 10.^(SNR/10); % noise power
 N_SNR = length(Es_N0);
 mse = zeros(N_SNR,M);
 
+sigma2 = 
 
-for N_blocks=1:4 % number of blocks of training sequence
+
+for N_blocks=1:6 % number of blocks of training sequence
     I = repmat((-1).^(0:N-1)',N_blocks,1); % training sequence
     W = repmat(dftmtx(N),N_blocks,1); % dft matrix
     for i=1:N_SNR
         for j=1:M
             % channel
-            hTrue = raylrnd(sqrt(sigma2),[L,1]).*exp(1i*2*pi*rand(L,1));
+            hTrue = sqrt(sigma2)*(randn(L,1)+1i*randn(L,1));
             lambda = repmat(fft(hTrue,N),N_blocks,1);
             
             % noise
@@ -30,10 +31,12 @@ for N_blocks=1:4 % number of blocks of training sequence
             r = lambda.*I+noise;
             
             % ML estimator
-            A = I.*W;
-            hEst = A\r;
+            A1 = (I.*W(:,1:L));
+            hEstML = A1\r; % automatically solve with LS
             
-            mse(i,j) = (hTrue-hEst(1:L))'*(hTrue-hEst(1:L));
+            A2 = [A1;1/(2*
+            
+            mse(i,j) = (hTrue-hEstML(1:L))'*(hTrue-hEstML(1:L));
         end
     end
     mse = mean(mse,2);
