@@ -1,7 +1,7 @@
 function [out] = viterbidecod(in)
-inbis=zeros(2,length(in)/2);
-
-for i=1:length(in)
+%inbis=zeros(2,length(in)/2);
+inbis=transpose(in);
+for i=1:2*length(in)
     if mod(i,2)==0
         inbis(2,i/2)=in(i);
     else

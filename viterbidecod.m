@@ -1,15 +1,15 @@
 function [out] = viterbidecod(in)
-inbis=zeros(2,length(in)/2);
+%inbis=zeros(2,length(in)/2);
+inbis=transpose(in);
+% for i=1:2*length(in)
+%     if mod(i,2)==0
+%         inbis(2,i/2)=in(i);
+%     else
+%         inbis(1,(i+1)/2)=in(i);
+%     end
+% end
 
-for i=1:length(in)
-    if mod(i,2)==0
-        inbis(2,i/2)=in(i);
-    else
-        inbis(1,(i+1)/2)=in(i);
-    end
-end
-
-out=zeros(1,length(in)/2);
+out=zeros(1,length(in));
 p = zeros(4,length(out)+2);
 e = zeros(4,1);
 p(1,1:4) =[0 0 0 0];
