@@ -1,4 +1,4 @@
-function [u,yDecoded,M] = viterbi(y,lambda)
+function [u,yDecoded,M] = viterbidecodsoft(y,lambda)
 % y         size [Nx2] normalized
 % lambda    size [Nx1]
 % u         size [Nx1]
@@ -7,7 +7,7 @@ function [u,yDecoded,M] = viterbi(y,lambda)
 N = length(y(:,1));
 
 % nextstate connections
-transitions = [0 0;
+arrows = [0 0;
     0 1;
     1 2;
     1 3;
@@ -54,10 +54,10 @@ for k = 1:N
             
             % if small metric, save distance and path
             % save it on in the position the arrow points
-            if d < distance(transitions(arrow,2),k+1)
-                distance(transitions(arrow,2),k+1) = d;
+            if d < distance(arrows(arrow,2),k+1)
+                distance(arrows(arrow,2),k+1) = d;
                 % path saves arrow
-                path(transitions(arrow,2),k) = arrow;
+                path(arrows(arrow,2),k) = arrow;
             end
         end
     end
@@ -73,7 +73,7 @@ next = zeros(N+1,1);
 [M,next(N+1)] = min(distance(:,N+1));
 for k=1:N
     arrow = path(next(N+2-k),N+1-k);
-    next(N+1-k) = transitions(arrow,1);
+    next(N+1-k) = arrows(arrow,1);
     yDecoded(N+1-k,:) = treillisbin(arrow,:);
     u(N+1-k) = mod(arrow,2) == 0;
 end
@@ -81,7 +81,7 @@ end
 %% draw the nice treillis
 
 figure;
-drawTreillis(transitions,treillis,N);
+drawTreillis(arrows,treillis,N);
 plot(0:N,4-next,'-','color',[0,1,1,0.5],'linewidth',3.5,'displayname','Decoded');
 
 end

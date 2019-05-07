@@ -27,7 +27,7 @@ for N_blocks=1:5 % number of blocks of training sequence
             lambda = repmat(fft(hTrue,N),N_blocks,1);
             
             % noise
-            noise = sqrt((Es_N0(i)).^-1)*(randn(N_blocks*N,1)+1i*randn(N_blocks*N,1));
+            noise = sqrt((Es_N0(i)).^-1/2)*(randn(N_blocks*N,1)+1i*randn(N_blocks*N,1));
             
             % received signal
             r = lambda.*I+noise;
