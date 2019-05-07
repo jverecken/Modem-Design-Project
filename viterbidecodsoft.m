@@ -3,6 +3,8 @@ function [u,yDecoded,M] = viterbidecodsoft(y,lambda)
 % lambda    size [Nx1]
 % u         size [Nx1]
 
+doplot = 0;
+
 %% parameters
 N = length(y(:,1));
 
@@ -79,22 +81,22 @@ for k=1:N
 end
 
 %% draw the nice treillis
-
-figure;
-drawTreillis(arrows,treillis,N);
-plot(0:N,4-next,'-','color',[0,1,1,0.5],'linewidth',3.5,'displayname','Decoded');
-
+if doplot
+    figure;
+    drawTreillis(arrows,treillis,N);
+    plot(0:N,4-next,'-','color',[0,1,1,0.5],'linewidth',3.5,'displayname','Decoded');
+end
 end
 
-function drawTreillis(transitions,treillis,N)
+function drawTreillis(arrows,treillis,N)
 colors = [0 0.4470 0.7410;
     0.8500 0.3250 0.0980;
     0.4940 0.1840 0.5560;
     0.4660 0.6740 0.1880];
 for i=1:N
     for j=1:4
-        plot([i-1 i],4-transitions(2*j-1,:),'-','Color',colors(j,:),'linewidth',1.5); hold on;
-        plot([i-1 i],4-transitions(2*j,:),'--','Color',colors(j,:),'linewidth',1.5);
+        plot([i-1 i],4-arrows(2*j-1,:),'-','Color',colors(j,:),'linewidth',1.5); hold on;
+        plot([i-1 i],4-arrows(2*j,:),'--','Color',colors(j,:),'linewidth',1.5);
         if i == 1
             label{2*j-1} = sprintf('%d',treillis(2*j-1));
             label{2*j} = sprintf('%d',treillis(2*j));

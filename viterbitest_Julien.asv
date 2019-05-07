@@ -1,0 +1,14 @@
+%% test viterbi
+close all;
+clearvars;
+
+uTrue = [0;1;1;0;1;0;0;1;1];
+y = viterbicod(uTrue');
+ 
+y = (y*2-1)/sqrt(2);
+y(
+ 
+uDecoded = viterbidecodsoft(y,ones(length(y(:,1)),1));
+
+error = sum(abs(uTrue-uDecoded));
+fprintf("Erros = %d\n",error);

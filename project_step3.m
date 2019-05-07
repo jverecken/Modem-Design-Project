@@ -6,8 +6,8 @@ clearvars;
 N = 128; % number of subcarriers
 L = 8; % length of the channel coefficients
 
-M = 2000; % number of trials
-SNR = linspace(0,10,21); % db
+M = 500; % number of trials
+SNR = linspace(-10,10,21); % db
 Es_N0 = 10.^(SNR/10); % noise power
 N_SNR = length(Es_N0);
 mseML = zeros(N_SNR,M);
