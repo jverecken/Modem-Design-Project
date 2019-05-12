@@ -1,13 +1,15 @@
-function [u,yDecoded,M] = viterbidecodsoft(y,lambda)
+function rx_symbols = viterbidecodsoft(rx_symbols_soft,c,E,sigma2n,N)
 % y         size [Nx2] normalized
 % lambda    size [Nx1]
 % u         size [Nx1]
 
 doplot = 0;
 
-%% parameters
-N = length(y(:,1));
+N_blocks = floor(length(rx_symbols_soft(:,1))/N);
+rx_symbols = zeros(1,length(rx_symbols_soft(:,1)));
+lambda = 1/sqrt(N)*fft(c,N);
 
+%% parameters
 % nextstate connections
 arrows = [0 0;
     0 1;
@@ -28,56 +30,66 @@ treillis = [0;
     2;
     1];
 
+
 %% init
-% prealloc distance, path array
-distance = 1e6*ones(4,N+1);
-path = zeros(4,N);
-
-% first column is zero distance
-distance(:,1) = zeros(4,1);
-
 % binary representation for soft decoding (-1/sqrt(2) and 1/sqrt(2))
 treillisbin = zeros(8,2);
 for i = 1:8
     treillisbin(i,:) = num2bin(treillis(i),2);
 end
 
-%% compute full size treillis
-% for cell
-for k = 1:N
-    % for node
-    for j = 1:4
-        % for arrow
-        for i = 0:1
-            arrow = (2*j-1)+i;
-            % compute ML metric
-            diff = (y(k,:) - lambda(k)*treillisbin(arrow,:));
-            d = distance(j,k) + (diff * diff');
-            
-            % if small metric, save distance and path
-            % save it on in the position the arrow points
-            if d < distance(arrows(arrow,2),k+1)
-                distance(arrows(arrow,2),k+1) = d;
-                % path saves arrow
-                path(arrows(arrow,2),k) = arrow;
+for m = 1:N_blocks
+    y = rx_symbols_soft(1+(m-1)*N:m*N,:);
+    
+    %% reset
+    % prealloc distance, path array
+    distance = 1e6*ones(4,N+1);
+    path = zeros(4,N);
+    
+    % first column is zero distance
+    distance(:,1) = zeros(4,1);
+    
+    
+    %% compute full size treillis
+    % for cell
+    for k = 1:N
+        % for node
+        for j = 1:4
+            % for arrow
+            for i = 0:1
+                arrow = (2*j-1)+i;
+                % compute ML metric, depends on channel param and equalization
+                % type : ML (zero forcing) or MMSE
+                diff = (y(k,:) - E(k)*lambda(k)*treillisbin(arrow,:))/(E(k)*sqrt(sigma2n));
+                d = distance(j,k) + (diff * diff');
+                
+                % if small metric, save distance and path
+                % save it on in the position the arrow points
+                if d < distance(arrows(arrow,2),k+1)
+                    distance(arrows(arrow,2),k+1) = d;
+                    % path saves arrow
+                    path(arrows(arrow,2),k) = arrow;
+                end
             end
         end
     end
-end
-
-%% decode
-% prealloc
-yDecoded = zeros(N,2);
-u = zeros(N,1);
-next = zeros(N+1,1);
-
-% go backward in the path
-[M,next(N+1)] = min(distance(:,N+1));
-for k=1:N
-    arrow = path(next(N+2-k),N+1-k);
-    next(N+1-k) = arrows(arrow,1);
-    yDecoded(N+1-k,:) = treillisbin(arrow,:);
-    u(N+1-k) = mod(arrow,2) == 0;
+    
+    %% decode
+    % prealloc
+    yDecoded = zeros(N,2);
+    u = zeros(1,N);
+    next = zeros(N+1,1);
+    
+    % go backward in the path
+    [~,next(N+1)] = min(distance(:,N+1));
+    for k=1:N
+        arrow = path(next(N+2-k),N+1-k);
+        next(N+1-k) = arrows(arrow,1);
+        yDecoded(N+1-k,:) = treillisbin(arrow,:);
+        u(N+1-k) = mod(arrow,2) == 0;
+    end
+    rx_symbols(1+(m-1)*N:m*N) = u;
+    
 end
 
 %% draw the nice treillis

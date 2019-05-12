@@ -2,8 +2,8 @@
 close all;
 clearvars;
 
-for i = 1:50
-    uTrue = round(rand(128,1));
+for i = 1:1
+    uTrue = round(rand(10,1));
     y = viterbicod(uTrue');
     
     y = (y*2-1)/sqrt(2);
