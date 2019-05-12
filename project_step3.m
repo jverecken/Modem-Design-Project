@@ -18,7 +18,7 @@ sigma2 = 1;
 
 for N_blocks=2:5 % number of blocks of training sequence
     I = repmat((-1).^(0:N-1)',N_blocks,1); % training sequence
-    W = repmat(dftmtx(N),N_blocks,1); % dft matrix
+    W = repmat(dftmtx(N)/sqrt(N),N_blocks,1); % dft matrix
     for i=1:N_SNR
         for j=1:M
             % channel
@@ -29,7 +29,7 @@ for N_blocks=2:5 % number of blocks of training sequence
             lambda = repmat(fft(hTrue,N),N_blocks,1);
             
             % noise
-            noise = 0*sqrt(Es_N0(i).^-1)*(randn(N_blocks*N,1)+1i*randn(N_blocks*N,1));
+            noise = sqrt(Es_N0(i).^-1)*(randn(N_blocks*N,1)+1i*randn(N_blocks*N,1))/sqrt(2);
             
             % received signal
             r = lambda.*I+noise;

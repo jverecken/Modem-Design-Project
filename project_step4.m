@@ -126,7 +126,7 @@ for i = 1:N_SNR
         
         [s_eq_c,E] = equalize(s_not_eq_c,c,paramEqualize);
         rx_symbols_c_soft = qamdemod4soft(s_eq_c);
-        rx_symbols_c = viterbidecodsoft(rx_symbols_c_soft.',c_est_nc,E,sigma2n,N);
+        rx_symbols_c = viterbidecodsoft(rx_symbols_c_soft.',c_est_nc,E,sigma2n,N,1,1);
         
         %% SER computation
         SER_nc(j,i) = sum(rx_symbols_nc ~= tx_symbols_nc)/N_symbols;
@@ -143,8 +143,8 @@ SER_th2 = 1-sqrt((Es_N0/2)./(Es_N0/2+1));
 figure;
 semilogy(SNR,SER_th1,'--r','linewidth',1.5,'displayname','awgn'); hold on;
 semilogy(SNR,SER_th2,'--k','linewidth',1.5,'displayname','rayleigh'); hold on;
-semilogy(SNR,SER_nc,'x-b','linewidth',1.5,'displayname','MMSE - non coded');
-semilogy(SNR,SER_c,'x-g','linewidth',1.5,'displayname','MMSE - coded');
+semilogy(SNR,SER_nc,'x-b','linewidth',1.5,'displayname','non coded');
+semilogy(SNR,SER_c,'x-g','linewidth',1.5,'displayname','coded - test');
 ylim([1e-6 1]);
 grid on;
 xlabel('Es/N0');

@@ -1,4 +1,4 @@
-function rx_symbols = viterbidecodsoft(rx_symbols_soft,c,E,sigma2n,N)
+function rx_symbols = viterbidecodsoft(rx_symbols_soft,c,E,sigma2n,N,hard,knowledge)
 % y         size [Nx2] normalized
 % lambda    size [Nx1]
 % u         size [Nx1]
@@ -8,6 +8,10 @@ doplot = 0;
 N_blocks = floor(length(rx_symbols_soft(:,1))/N);
 rx_symbols = zeros(1,length(rx_symbols_soft(:,1)));
 lambda = 1/sqrt(N)*fft(c,N);
+
+if hard
+    rx_symbols_soft = sqrt(2)*((rx_symbols_soft > 0)-0.5);
+end
 
 %% parameters
 % nextstate connections
@@ -60,7 +64,11 @@ for m = 1:N_blocks
                 arrow = (2*j-1)+i;
                 % compute ML metric, depends on channel param and equalization
                 % type : ML (zero forcing) or MMSE
-                diff = (y(k,:) - E(k)*lambda(k)*treillisbin(arrow,:))/(E(k)*sqrt(sigma2n));
+                if knowledge
+                    diff = (y(k,:) - E(k)*lambda(k)*treillisbin(arrow,:))/(E(k)*sqrt(sigma2n));
+                else
+                    diff = (y(k,:) - treillisbin(arrow,:));
+                end
                 d = distance(j,k) + (diff * diff');
                 
                 % if small metric, save distance and path
