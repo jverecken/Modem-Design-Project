@@ -1,3 +1,9 @@
+close all;
+clearvars;
+
+N_SNR = 11;
+SNR = linspace(0,20,N_SNR);
+
 load('SER_awgn_TH');
 load('SER_rayleigh_TH');
 load('SER_rayleigh_NC_ZF');
@@ -23,7 +29,7 @@ semilogy(SNR,SER_rayleigh_NC_MMSE,'.:','Color',colors(3,:),'linewidth',1.5,'mark
 semilogy(SNR,SER_rayleigh_C_MMSE,'.:','Color',colors(4,:),'linewidth',1.5,'markersize',15,'displayname','MMSE - coded');
 ylim([1e-6 1]);
 grid on;
-xlabel('Es/N0');
+xlabel('Es/N0 [dB]');
 ylabel('SER');
 legend('location','best');
 title(sprintf('OFDM - 8 taps Rayleigh channel\nEqualization - Convolutional coding'));
