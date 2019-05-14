@@ -4,7 +4,7 @@ method = paramEqualize.method;
 sigma2n = paramEqualize.sigma2n;
 N_blocks = size(s,1);
 
-lambda = 1/sqrt(N)*fft(c,N);
+lambda = fft(c,N);
 
 switch method
     case 'ZF'

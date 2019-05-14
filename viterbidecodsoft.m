@@ -42,6 +42,12 @@ for i = 1:8
     treillisbin(i,:) = num2bin(treillis(i),2);
 end
 
+%% draw the nice treillis
+    if doplot
+        figure;
+        drawTreillis(arrows,treillis,1);
+    end
+
 for m = 1:N_blocks
     y = rx_symbols_soft(1+(m-1)*N:m*N,:);
     
@@ -98,14 +104,15 @@ for m = 1:N_blocks
     end
     rx_symbols(1+(m-1)*N:m*N) = u;
     
+    if doplot
+        figure;
+        drawTreillis(arrows,treillis,N); hold on;
+        plot(0:N,4-next,'-','color',[0,1,1,0.5],'linewidth',3.5,'displayname','Decoded');
+    end
+        
 end
 
-%% draw the nice treillis
-if doplot
-    figure;
-    drawTreillis(arrows,treillis,N);
-    plot(0:N,4-next,'-','color',[0,1,1,0.5],'linewidth',3.5,'displayname','Decoded');
-end
+
 end
 
 function drawTreillis(arrows,treillis,N)

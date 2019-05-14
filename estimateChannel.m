@@ -9,7 +9,7 @@ method   = param.method;
 I = I.';
 r = r.';
 
-W = repmat(dftmtx(N)/sqrt(N),N_blocks,1);
+W = repmat(dftmtx(N),N_blocks,1);
 A1 = (I.*W(:,1:L));
 % ML estimator
 switch method

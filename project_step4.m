@@ -14,7 +14,7 @@ K = length(indexK); % number of null tones
 
 % channel
 Lc = 8;
-sigma2c = N;
+sigma2c = 1;
 
 % channel estimation
 N_blocks_training = 2;
@@ -29,7 +29,7 @@ paramEqualize.N = N;
 
 %% generate symbols
 % transmitted symbols
-N_symbols = (N-K)*10;
+N_symbols = (N-K)*50;
 bits_nc = floor(2*rand(1,2*N_symbols));
 bits_c = floor(2*rand(1,N_symbols));
 % non coded 
@@ -61,11 +61,11 @@ Cuu = conv(u,flip(u));
 Eu = u*u';
 
 % snr simulations
-N_SNR = 11;
-SNR = linspace(0,20,N_SNR);
+N_SNR = 21;
+SNR = linspace(0,30,N_SNR);
 Es_N0 = 10.^(SNR/10);
-Trials = 500;
-[SER_nc,SER_c] = deal(zeros(Trials,N_SNR));
+Trials = 10;
+[SER_nc,SER_c,MSE_nc] = deal(zeros(Trials,N_SNR));
 
 for i = 1:N_SNR
     fprintf('SNR = %d\n',SNR(i));
@@ -74,11 +74,11 @@ for i = 1:N_SNR
         %% 8-tap rayleigh channel
         %test = [1 0.3 -0.2 0 0 0 0 0.5];
         %test = test/sqrt(test*test');
-        %perfect = [1 0 0 0 0 0 0 0];
+        perfect = [1 0 0 0 0 0 0 0];
         c = sqrt(sigma2c)*(randn(1,Lc)+1i*randn(1,Lc))/sqrt(2*Lc); % rayleigh channel
         c_L = upsample(c,M);
         Ec = c_L*c_L';
-        h = conv(c_L,Cuu)/sqrt(sigma2c);% same energy convolution
+        h = conv(c_L,Cuu);% same energy convolution
         
         % noise free signal
         r_nf_nc_L = conv(h,x_nc_L);
@@ -106,7 +106,7 @@ for i = 1:N_SNR
         r_training_nc = r_nc(1:(N+Lp)*N_blocks_training);
         s_training_nc = ofdmdemod(r_training_nc,N,Lp,K,indexK,1);
         c_est_nc = estimateChannel(training,s_training_nc,paramEstimation);
-        MSE_nc = 1/Lc*((c-c_est_nc)*(c-c_est_nc)');
+        MSE_nc(j,i) = 1/Lc*((c-c_est_nc)*(c-c_est_nc)');
         r_nc = r_nc(1+(N+Lp)*N_blocks_training:end);
         
         r_training_c = r_c(1:(N+Lp)*N_blocks_training);
@@ -121,23 +121,24 @@ for i = 1:N_SNR
         
         %% equalization
         paramEqualize.method = 'ZF';
-        [s_eq_nc] = equalize(s_not_eq_nc,c,paramEqualize);
+        [s_eq_nc] = equalize(s_not_eq_nc,c_est_nc,paramEqualize);
         rx_symbols_nc = qamdemodBis(s_eq_nc,2,2);
         
-        [s_eq_c,E] = equalize(s_not_eq_c,c,paramEqualize);
+        [s_eq_c,E] = equalize(s_not_eq_c,c_est_c,paramEqualize);
         rx_symbols_c_soft = qamdemod4soft(s_eq_c);
-        rx_symbols_c = viterbidecodsoft(rx_symbols_c_soft.',c_est_nc,E,sigma2n,N,1,1);
+        rx_symbols_c = viterbidecodsoft(rx_symbols_c_soft.',c_est_c,E,sigma2n,N,0,1);
         
         %% SER computation
         SER_nc(j,i) = sum(rx_symbols_nc ~= tx_symbols_nc)/N_symbols;
         SER_c(j,i) = sum(rx_symbols_c ~= bits_c)/N_symbols;
     end
 end
+MSE_nc = mean(MSE_nc);
 SER_nc = mean(SER_nc);
 SER_c = mean(SER_c);
 %% theoretical BER curve
 SER_th1 = erfc(sqrt(Es_N0/2));
-SER_th2 = 1-sqrt((Es_N0/2)./(Es_N0/2+1));
+SER_th2 = (1-sqrt((Es_N0/2)./(Es_N0/2+1)));
 
 %% BER plot
 figure;
@@ -150,3 +151,10 @@ grid on;
 xlabel('Es/N0');
 ylabel('SER');
 legend('location','best');
+
+%% MSE channel plot
+figure;
+semilogy(SNR,MSE_nc,'.-','linewidth',1.5,'markersize',15);
+grid on;
+xlabel('Es/N0');
+ylabel('MSE');

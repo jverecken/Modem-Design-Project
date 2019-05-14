@@ -2,16 +2,18 @@
 close all;
 clearvars;
 
-for i = 1:1
-    uTrue = round(rand(10,1));
-    y = viterbicod(uTrue');
+    N = 10;
+    uTrue = [0 0 1 0 0 1 0 1 1 1];
+    c = zeros(1,N);
+    E = ones(1,N);
+    sigma2n = 1;
+    c(1) = N;
+    hard = 1;
+    knowledge = 0;
+    y = viterbicod(uTrue);
     
     y = (y*2-1)/sqrt(2);
     
-    uDecoded = viterbidecodsoft(y,ones(length(y(:,1)),1));
+    uDecoded = viterbidecodsoft(y',...
+                c,E,sigma2n,N,hard,knowledge);
     
-    error = sum(abs(uTrue-uDecoded));
-    if error ~= 0
-        fprintf("iter = %d Errors = %d\n",i,error);
-    end
-end

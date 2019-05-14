@@ -55,7 +55,7 @@ for i = 1:N_SNR
     r = r_nf + nu;
     
     %% ofdm demodulation
-    s_estimated = ofdmdemod(r,N,L,K,indexK);
+    s_estimated = ofdmdemod(r,N,L,K,indexK,1);
     
     rx_symbols = qamdemodBis(s_estimated,2,2); %4QAM demod
     SER(i) = sum(rx_symbols ~= tx_symbols)/N_symbols;
@@ -77,6 +77,6 @@ figure(2);
 semilogy(SNR,SER_th,'-r','linewidth',1.5); hold on;
 semilogy(SNR,SER,'xb','linewidth',1.5);
 grid on;
-xlabel('Es_N0');
+xlabel('Es/N0');
 ylabel('SER');
 legend('theory','simulation');
